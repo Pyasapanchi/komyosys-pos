@@ -23,7 +23,9 @@ not on Traefik), applies `deploy/vps-lockdown.sql`, and removes everything at th
 
 Expected result: `readLeaks=0`, `ALL TARGETED CHECKS PASSED`, `role unchanged`.
 Known benign noise: `webhook_deliveries` "write leaks" are the background webhook
-retry job updating A's seeded delivery, not B.
+retry job updating A's seeded delivery, not B. `keys.mjs` reports 1 read leak for
+the public QR order of A's own menu item at A's table: that is a guest using A's
+QR menu as intended, not cross-tenant access.
 
 The test client rotates `X-Forwarded-For` (the test copy sets `TRUST_PROXY=1`)
 to get past the per-IP rate limit; production does not trust that header.
