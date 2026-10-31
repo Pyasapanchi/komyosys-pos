@@ -31,12 +31,13 @@ services:
       traefik.http.routers.komyosys-pos.tls: "true"
       traefik.http.routers.komyosys-pos.tls.certresolver: mytls
       traefik.http.services.komyosys-pos-svc.loadbalancer.server.port: "3000"
-      # Hosted lockdown: no public signup, and no whole-database backup/restore
-      # API (see deploy/vps-lockdown.sql). An allow-list of only 127.0.0.1 means
-      # every real request is refused with 403. Case-insensitive and tolerant of
-      # repeated slashes, since Express routes case-insensitively.
+      # Hosted lockdown: block the APIs that act on the whole database rather
+      # than one restaurant: backups, Server Sync (and its peer endpoints) and
+      # system updates (see deploy/vps-lockdown.sql). An allow-list of only
+      # 127.0.0.1 means every real request is refused with 403. Case-insensitive
+      # and tolerant of repeated slashes, since Express routes case-insensitively.
       traefik.http.routers.komyosys-pos-deny.entrypoints: websecure
-      traefik.http.routers.komyosys-pos-deny.rule: 'Host(`pos.komyosys.ai`) && (PathRegexp(`(?i)^/+signup`) || PathRegexp(`(?i)^/+api/+v1/+auth/+register`) || PathRegexp(`(?i)^/+api/+v1/+backups`))'
+      traefik.http.routers.komyosys-pos-deny.rule: 'Host(`pos.komyosys.ai`) && (PathRegexp(`(?i)^/+api/+v1/+backups`) || PathRegexp(`(?i)^/+api/+v1/+sync`) || PathRegexp(`(?i)^/+api/+v1/+system`))'
       traefik.http.routers.komyosys-pos-deny.priority: "1000"
       traefik.http.routers.komyosys-pos-deny.service: komyosys-pos-svc
       traefik.http.routers.komyosys-pos-deny.middlewares: komyosys-pos-deny-all
