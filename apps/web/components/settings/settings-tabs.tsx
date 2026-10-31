@@ -25,7 +25,9 @@ const TABS: SettingsTab[] = [
   { label: "Audit Log", href: "/settings/audit-log", permission: "audit_log.view" },
   { label: "Backup", href: "/settings/backup", permission: "backup.manage" },
   { label: "Updates", href: "/settings/updates", permission: "system.update" },
-  { label: "Server Sync", href: "/settings/sync", permission: "settings.manage" },
+  // Server Sync is hidden: it syncs the whole database, not one restaurant, so on the
+  // shared hosted instance it is disabled (deploy/vps-lockdown.sql). Backup and Updates
+  // hide themselves there because no role holds backup.manage / system.update.
   { label: "API Keys", href: "/settings/api-keys" },
   { label: "Security", href: "/settings/security" },
   { label: "Webhooks", href: "/settings/webhooks", permission: "settings.manage" },
