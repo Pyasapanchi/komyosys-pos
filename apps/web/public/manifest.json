@@ -1,6 +1,6 @@
 {
-  "name": "Nodedr OrderRestro",
-  "short_name": "OrderRestro",
+  "name": "Komyosys POS",
+  "short_name": "Komyosys POS",
   "description": "Offline-first restaurant management system — POS, tables, kitchen display, menu, inventory.",
   "start_url": "/",
   "scope": "/",

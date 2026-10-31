@@ -16,7 +16,7 @@ export interface VersionInfo {
   checkedAt: string;
 }
 
-const GITHUB_REPO = 'Raktim94/nodedr-restaurant-pos';
+const GITHUB_REPO = 'Pyasapanchi/komyosys-pos';
 // Avoid hammering GitHub's unauthenticated rate limit (60 req/hr per IP,
 // shared across every self-hosted install behind the same egress IP in the
 // worst case) — a check this infrequent is still fast enough to surface a
@@ -159,7 +159,7 @@ export class UpdateService {
   // than a clear 404 means "can't tell", and the tag is trusted.
   private async imageTagExists(tag: string): Promise<boolean | null> {
     try {
-      const repo = 'raktim94/nodedr-restaurant-pos-backend';
+      const repo = 'pyasapanchi/komyosys-pos-backend';
       const version = tag.replace(/^v/i, '');
       const tokRes = await fetch(
         `https://ghcr.io/token?scope=repository:${repo}:pull`,
@@ -192,7 +192,7 @@ export class UpdateService {
       {
         headers: {
           Accept: 'application/vnd.github+json',
-          'User-Agent': 'nodedr-restaurant-pos-update-check',
+          'User-Agent': 'komyosys-pos-update-check',
         },
         signal: AbortSignal.timeout(5000),
       },

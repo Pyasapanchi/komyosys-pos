@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Logo } from "@/components/layout/logo";
 import { downloadHref } from "@/lib/downloads";
+import { SOURCE_URL } from "@/components/layout/brand-footer";
 
 const columns = [
   {
@@ -17,7 +18,6 @@ const columns = [
       { href: downloadHref("github"), label: "GitHub" },
       { href: "/docs/api", label: "API & MCP" },
       { href: "/docs/accessibility", label: "Accessibility statement" },
-      { href: "/docs/compliance-india", label: "India compliance notes" },
     ],
   },
   {
@@ -37,11 +37,11 @@ export function MarketingFooter() {
           <div>
             <Link href="/" className="flex items-center gap-2.5">
               <Logo size={28} />
-              <span className="text-sm font-semibold text-foreground">OrderRestro</span>
+              <span className="text-sm font-semibold text-foreground">Komyosys POS</span>
             </Link>
             <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-              Offline-first restaurant management, self-hosted on your own
-              server. Built by Nodedr Infotech Private Limited.
+              Restaurant management by Komyosys — POS, kitchen display,
+              tables, inventory and more.
             </p>
           </div>
 
@@ -68,9 +68,17 @@ export function MarketingFooter() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-border/60 pt-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            &copy; {new Date().getFullYear()} Nodedr Infotech Private Limited. Licensed AGPL-3.0.
+            &copy; {new Date().getFullYear()} Komyosys. Based on OrderRestro &copy; Nodedr Infotech
+            Private Limited and Raktim Ranjit. Licensed AGPL-3.0.
           </p>
-          <p className="text-xs text-muted-foreground">Made in India.</p>
+          <a
+            href={SOURCE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground hover:text-foreground hover:underline"
+          >
+            Source code
+          </a>
         </div>
       </div>
     </footer>

@@ -51,7 +51,7 @@ export default function SignupPage() {
             <Logo size={44} />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Nodedr OrderRestro
+            Komyosys POS
           </h1>
           <p className="text-sm text-muted-foreground">Set up your restaurant</p>
         </div>

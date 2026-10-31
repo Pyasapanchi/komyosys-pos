@@ -1,6 +1,9 @@
+> **Komyosys POS** is a modified version of Nodedr OrderRestro, licensed under AGPL-3.0.
+> See [`NOTICE.md`](./NOTICE.md) for what changed. The rest of this README is the upstream project's.
+
 <div align="center">
 
-<img src="apps/web/public/brand-lockup.png" alt="Nodedr OrderRestro" width="520">
+<img src="apps/web/public/logo.png" alt="Komyosys POS" width="120">
 
 <img src="docs/orderrestro-cover.jpg" alt="Illustrative evening scene in an independent restaurant" width="100%">
 

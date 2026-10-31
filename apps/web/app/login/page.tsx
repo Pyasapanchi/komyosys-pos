@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { AlertCircle } from "lucide-react";
+import { SOURCE_URL } from "@/components/layout/brand-footer";
 import { Logo } from "@/components/layout/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -67,7 +68,7 @@ export default function LoginPage() {
             <Logo size={44} />
           </Link>
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Nodedr OrderRestro
+            Komyosys POS
           </h1>
           <p className="text-sm text-muted-foreground">Sign in to manage your restaurant</p>
         </div>
@@ -148,6 +149,12 @@ export default function LoginPage() {
           <Link href="/signup" className="font-medium text-foreground hover:underline">
             Create an account
           </Link>
+        </p>
+        <p className="mt-4 text-center text-[11px] text-muted-foreground/70">
+          Based on OrderRestro (AGPL-3.0) ·{" "}
+          <a href={SOURCE_URL} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
+            Source
+          </a>
         </p>
       </motion.div>
     </main>

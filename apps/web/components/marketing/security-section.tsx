@@ -69,13 +69,6 @@ export function SecuritySection() {
           >
             Read the accessibility statement
           </Link>
-          <span className="text-sm text-muted-foreground">·</span>
-          <Link
-            href="/docs/compliance-india"
-            className="text-sm font-medium text-primary underline underline-offset-4"
-          >
-            Read the India compliance notes
-          </Link>
         </Reveal>
       </div>
     </section>

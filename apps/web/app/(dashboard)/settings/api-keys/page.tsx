@@ -163,7 +163,7 @@ function IntegrationApiKeysCard() {
         <div>
           <h2 className="text-[18px] font-medium text-foreground">Integration API keys</h2>
           <p className="text-sm text-muted-foreground">
-            Credentials for an external website or system to use OrderRestro as a backend — browse the menu, place
+            Credentials for an external website or system to use Komyosys POS as a backend — browse the menu, place
             orders, and book tables for a location. Not tied to any staff account.
           </p>
         </div>
