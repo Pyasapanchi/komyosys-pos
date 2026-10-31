@@ -1,0 +1,23 @@
+Komyosys POS - restoring a backup
+================================
+
+Backups: /opt/komyosys-pos-backups   (db_<date>.dump + uploads_<date>.tar.gz, last 14 days)
+Log:     /var/log/komyosys-pos-backup.log
+Run a backup now:  /usr/local/bin/komyosys-pos-backup
+
+WARNING: restoring REPLACES all current POS data with the backup's data.
+Take a fresh backup first (command above) so you can undo.
+
+1. Stop the app (database keeps running):
+   cd /opt/komyosys-pos
+   docker compose -f docker-compose.yml -f docker-compose.vps.yml stop backend web
+
+2. Restore the database (change the file name to the backup you want):
+   docker exec -i nodedr-restaurant-postgres pg_restore -U nodedr -d nodedr_restaurant --clean --if-exists --no-owner < /opt/komyosys-pos-backups/db_2026-10-31_0230.dump
+
+3. Restore uploaded images (same date):
+   docker compose -f docker-compose.yml -f docker-compose.vps.yml start backend
+   docker exec -i nodedr-restaurant-backend sh -c 'rm -rf /data/uploads/* && tar xzf - -C /data/uploads' < /opt/komyosys-pos-backups/uploads_2026-10-31_0230.tar.gz
+
+4. Start everything:
+   docker compose -f docker-compose.yml -f docker-compose.vps.yml start backend web
