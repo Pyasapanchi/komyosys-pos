@@ -13,6 +13,11 @@ services:
       # Traefik accepts this site's traffic from Cloudflare alone (see
       # komyosys-pos-cloudflare-only below), which sets this header itself.
       CLIENT_IP_HEADER: cf-connecting-ip
+      # Password-reset and verification emails. Set SMTP_URL / SMTP_FROM in
+      # /opt/komyosys-pos/.env (root-only, never committed); empty = no emails.
+      SMTP_URL: "${SMTP_URL:-}"
+      SMTP_FROM: "${SMTP_FROM:-}"
+      APP_URL: "https://pos.komyosys.ai"
     mem_limit: 1g
 
   web:
