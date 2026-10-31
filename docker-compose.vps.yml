@@ -31,6 +31,18 @@ services:
       traefik.http.routers.komyosys-pos.tls: "true"
       traefik.http.routers.komyosys-pos.tls.certresolver: mytls
       traefik.http.services.komyosys-pos-svc.loadbalancer.server.port: "3000"
+      # Hosted lockdown: no public signup, and no whole-database backup/restore
+      # API (see deploy/vps-lockdown.sql). An allow-list of only 127.0.0.1 means
+      # every real request is refused with 403. Case-insensitive and tolerant of
+      # repeated slashes, since Express routes case-insensitively.
+      traefik.http.routers.komyosys-pos-deny.entrypoints: websecure
+      traefik.http.routers.komyosys-pos-deny.rule: 'Host(`pos.komyosys.ai`) && (PathRegexp(`(?i)^/+signup`) || PathRegexp(`(?i)^/+api/+v1/+auth/+register`) || PathRegexp(`(?i)^/+api/+v1/+backups`))'
+      traefik.http.routers.komyosys-pos-deny.priority: "1000"
+      traefik.http.routers.komyosys-pos-deny.service: komyosys-pos-svc
+      traefik.http.routers.komyosys-pos-deny.middlewares: komyosys-pos-deny-all
+      traefik.http.routers.komyosys-pos-deny.tls: "true"
+      traefik.http.routers.komyosys-pos-deny.tls.certresolver: mytls
+      traefik.http.middlewares.komyosys-pos-deny-all.ipallowlist.sourcerange: 127.0.0.1/32
 
   postgres:
     mem_limit: 512m
