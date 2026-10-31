@@ -1,0 +1,22 @@
+# Throwaway tenant-isolation test stack. Not on Traefik, no published ports,
+# own volumes (project name pos-isotest). Delete with: docker compose -p pos-isotest ... down -v
+services:
+  postgres:
+    container_name: pos-isotest-postgres
+    mem_limit: 512m
+  backend:
+    container_name: pos-isotest-backend
+    mem_limit: 1g
+    volumes: !override
+      - uploads_data:/data/uploads
+    device_cgroup_rules: !reset []
+    environment:
+      UPDATER_URL: ""
+      CORS_ORIGIN: "http://isotest.local"
+      # Test-only: honour X-Forwarded-For so the test client can rotate IPs
+      # past the 300/min throttle. Production leaves this empty.
+      TRUST_PROXY: "1"
+  web:
+    profiles: ["disabled"]
+  updater:
+    profiles: ["disabled"]
