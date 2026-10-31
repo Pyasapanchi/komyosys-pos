@@ -48,16 +48,7 @@ export class UsersService {
     await this.assertRoleInRestaurant(restaurantId, dto.roleId);
     await this.assertBranchesInRestaurant(restaurantId, dto.branchIds);
 
-    if (dto.email) {
-      const existing = await this.prisma.user.findFirst({
-        where: { restaurantId, email: dto.email },
-      });
-      if (existing) {
-        throw new ConflictException(
-          'A staff account with this email already exists',
-        );
-      }
-    }
+    if (dto.email) await this.assertEmailFree(dto.email);
 
     const passwordHash = await bcrypt.hash(dto.password, 12);
     const user = await this.prisma.user.create({
@@ -68,6 +59,8 @@ export class UsersService {
         phone: dto.phone,
         roleId: dto.roleId,
         passwordHash,
+        // The owner vouches for staff they add, so no verification email.
+        emailVerifiedAt: dto.email ? new Date() : null,
         branches: {
           create: dto.branchIds.map((branchId) => ({ branchId })),
         },
@@ -125,6 +118,7 @@ export class UsersService {
     if (dto.branchIds) {
       await this.assertBranchesInRestaurant(restaurantId, dto.branchIds);
     }
+    if (dto.email) await this.assertEmailFree(dto.email, id);
 
     const passwordHash = dto.password
       ? await bcrypt.hash(dto.password, 12)
@@ -139,6 +133,8 @@ export class UsersService {
         roleId: dto.roleId,
         isActive: dto.isActive,
         passwordHash,
+        // Signs the user out everywhere once their password changes.
+        passwordChangedAt: passwordHash ? new Date() : undefined,
         ...(dto.branchIds
           ? {
               branches: {
@@ -228,6 +224,22 @@ export class UsersService {
     });
 
     return { ok: true };
+  }
+
+  // Login and password reset find an account by email alone, so an email may
+  // belong to only one account across ALL restaurants (also enforced by the
+  // users_email_lower_key index). The message doesn't say which restaurant.
+  private async assertEmailFree(email: string, exceptUserId?: string) {
+    const taken = await this.prisma.user.findFirst({
+      where: {
+        email: { equals: email.trim(), mode: 'insensitive' },
+        ...(exceptUserId ? { id: { not: exceptUserId } } : {}),
+      },
+      select: { id: true },
+    });
+    if (taken) {
+      throw new ConflictException('This email is already used by another account');
+    }
   }
 
   private async assertRoleInRestaurant(restaurantId: string, roleId: string) {

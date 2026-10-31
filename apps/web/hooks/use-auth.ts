@@ -1,6 +1,13 @@
 "use client";
 
-import { permissionSatisfied, type LoginDto, type RegisterDto, type SessionUser } from "@nodedr-restaurant/types";
+import {
+  permissionSatisfied,
+  type ForgotPasswordDto,
+  type LoginDto,
+  type RegisterDto,
+  type ResetPasswordDto,
+  type SessionUser,
+} from "@nodedr-restaurant/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
@@ -42,6 +49,32 @@ export function useLogout() {
     onSuccess: () => {
       queryClient.clear();
     },
+  });
+}
+
+export function useForgotPassword() {
+  return useMutation({
+    mutationFn: (dto: ForgotPasswordDto) => api.post<{ ok: true }>("/auth/forgot-password", dto),
+  });
+}
+
+export function useResetPassword() {
+  return useMutation({
+    mutationFn: (dto: ResetPasswordDto) => api.post<{ ok: true }>("/auth/reset-password", dto),
+  });
+}
+
+export function useVerifyEmail() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (token: string) => api.post<{ ok: true }>("/auth/verify-email", { token }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["auth", "me"] }),
+  });
+}
+
+export function useResendVerification() {
+  return useMutation({
+    mutationFn: () => api.post<{ ok: true }>("/auth/resend-verification"),
   });
 }
 

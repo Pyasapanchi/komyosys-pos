@@ -245,10 +245,13 @@ model User {
   twoFactorEnabled        Boolean  @default(false)
   twoFactorRecoveryHashes String[] @default([]) // bcrypt hashes of unused one-time recovery codes
   twoFactorLastStep       Int? // last accepted TOTP step: a code works once
+  emailVerifiedAt         DateTime? // set by the emailed verification link (or staff created by an owner)
+  passwordChangedAt       DateTime? // sessions issued before this are rejected (see jwt.strategy.ts)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  authTokens    AuthToken[]
   branches      UserBranch[]
   waiterTables  Table[]        @relation("TableWaiter")
   ordersCreated Order[]        @relation("OrderCreatedBy")
@@ -280,9 +283,33 @@ model User {
   staffApiKeys              StaffApiKey[]
   integrationApiKeysCreated IntegrationApiKey[] @relation("IntegrationApiKeyCreatedBy")
 
+  // Emails are also unique across ALL restaurants, case-insensitively: login and
+  // password reset find an account by email alone. Enforced by the expression
+  // index users_email_lower_key (migration 20261101000000_auth_tokens), which
+  // Prisma can't express here.
   @@unique([restaurantId, email])
   @@index([restaurantId])
   @@map("users")
+}
+
+enum AuthTokenPurpose {
+  PASSWORD_RESET
+  EMAIL_VERIFY
+}
+
+// One-time links emailed to a user. Only a SHA-256 of the token is stored.
+model AuthToken {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purpose   AuthTokenPurpose
+  tokenHash String           @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, purpose])
+  @@map("auth_tokens")
 }
 
 // ---------------------------------------------------------------------------

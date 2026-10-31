@@ -10,12 +10,18 @@ import {
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
+  forgotPasswordSchema,
   loginSchema,
   pinLoginSchema,
   registerSchema,
+  resetPasswordSchema,
   twoFactorCodeSchema,
   twoFactorDisableSchema,
+  verifyEmailSchema,
+  type ForgotPasswordDto,
+  type ResetPasswordDto,
   type SessionUser,
+  type VerifyEmailDto,
 } from '@nodedr-restaurant/types';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
@@ -93,6 +99,40 @@ export class AuthController {
     const { token, user } = await this.authService.pinLogin(body as never);
     this.setSessionCookie(res, token);
     return { user };
+  }
+
+  // Same answer whether or not the email has an account, so it can't be used
+  // to discover who has one. Tight limit: each call can send an email.
+  @Throttle({ default: { limit: 5, ttl: 60_000 } })
+  @Post('forgot-password')
+  @UsePipes(new ZodValidationPipe(forgotPasswordSchema))
+  forgotPassword(@Body() body: ForgotPasswordDto) {
+    this.authService.requestPasswordReset(body.email);
+    return { ok: true };
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('reset-password')
+  @UsePipes(new ZodValidationPipe(resetPasswordSchema))
+  async resetPassword(@Body() body: ResetPasswordDto) {
+    await this.authService.resetPassword(body);
+    return { ok: true };
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @Post('verify-email')
+  @UsePipes(new ZodValidationPipe(verifyEmailSchema))
+  async verifyEmail(@Body() body: VerifyEmailDto) {
+    await this.authService.verifyEmailToken(body.token);
+    return { ok: true };
+  }
+
+  @Throttle({ default: { limit: 3, ttl: 60_000 } })
+  @UseGuards(JwtAuthGuard)
+  @Post('resend-verification')
+  async resendVerification(@CurrentUser() user: SessionUser) {
+    await this.authService.sendEmailVerification(user.id);
+    return { ok: true };
   }
 
   @Post('logout')

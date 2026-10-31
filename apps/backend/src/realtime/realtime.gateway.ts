@@ -7,6 +7,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import type { Server, Socket } from 'socket.io';
+import { isSessionRevoked } from '../auth/jwt.strategy';
 import { BranchAccessService } from '../common/services/branch-access.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -58,11 +59,13 @@ export class RealtimeGateway
       const token = this.extractSessionCookie(client);
       if (!token) throw new Error('No session cookie');
 
-      const payload = this.jwt.verify<{ sub: string }>(token);
+      const payload = this.jwt.verify<{ sub: string; iat?: number }>(token);
       const user = await this.prisma.user.findUnique({
         where: { id: payload.sub },
       });
-      if (!user || !user.isActive) throw new Error('Session no longer valid');
+      if (!user || !user.isActive || isSessionRevoked(user, payload.iat)) {
+        throw new Error('Session no longer valid');
+      }
 
       const branchId = client.handshake.query.branchId;
       if (typeof branchId !== 'string' || !branchId) {

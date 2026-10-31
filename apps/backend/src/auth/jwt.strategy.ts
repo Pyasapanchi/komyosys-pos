@@ -7,6 +7,22 @@ import { PrismaService } from '../prisma/prisma.service';
 
 interface JwtPayload {
   sub: string;
+  iat?: number;
+}
+
+/**
+ * A session issued before the user's last password change no longer counts,
+ * so a reset signs out everyone holding the old one. `iat` is in whole seconds,
+ * so compare at second precision (a login in the same second as the change
+ * still works).
+ */
+export function isSessionRevoked(
+  user: { passwordChangedAt: Date | null },
+  iat: number | undefined,
+): boolean {
+  if (!user.passwordChangedAt) return false;
+  if (typeof iat !== 'number') return true;
+  return iat < Math.floor(user.passwordChangedAt.getTime() / 1000);
 }
 
 const cookieExtractor = (req: {
@@ -36,7 +52,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       },
     });
 
-    if (!user || !user.isActive) {
+    if (!user || !user.isActive || isSessionRevoked(user, payload.iat)) {
       throw new UnauthorizedException('Session no longer valid');
     }
 
@@ -47,6 +63,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       roleId: user.roleId,
       roleName: user.role.name,
       permissions: user.role.permissions.map((rp) => rp.permission.key),
+      emailVerified: !user.email || !!user.emailVerifiedAt,
     };
   }
 }

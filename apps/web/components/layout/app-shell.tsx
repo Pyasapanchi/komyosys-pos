@@ -15,6 +15,7 @@ import { Logo } from "./logo";
 import { MobileBottomNav } from "./mobile-bottom-nav";
 import { SidebarNav } from "./sidebar-nav";
 import { UserMenu } from "./user-menu";
+import { VerifyEmailBanner } from "./verify-email-banner";
 
 // The restaurant's own logo + name lead the sidebar header — this is
 // white-label self-hosted software, so the operator's branding takes the
@@ -112,6 +113,7 @@ export function AppShell({
             <UserMenu user={user} />
           </div>
         </header>
+        <VerifyEmailBanner user={user} />
         <main className="flex-1 overflow-y-auto p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8">{children}</main>
         <EntityDialogHost />
       </div>

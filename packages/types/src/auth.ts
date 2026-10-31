@@ -30,8 +30,26 @@ export const sessionUserSchema = z.object({
   roleId: z.string(),
   roleName: z.string(),
   permissions: z.array(z.string()),
+  // false only for a self-signup whose verification link hasn't been clicked yet.
+  emailVerified: z.boolean().optional(),
 });
 export type SessionUser = z.infer<typeof sessionUserSchema>;
+
+export const forgotPasswordSchema = z.object({
+  email: z.string().trim().email(),
+});
+export type ForgotPasswordDto = z.infer<typeof forgotPasswordSchema>;
+
+export const resetPasswordSchema = z.object({
+  token: z.string().trim().min(20).max(200),
+  password: z.string().min(8).max(128),
+});
+export type ResetPasswordDto = z.infer<typeof resetPasswordSchema>;
+
+export const verifyEmailSchema = z.object({
+  token: z.string().trim().min(20).max(200),
+});
+export type VerifyEmailDto = z.infer<typeof verifyEmailSchema>;
 
 export const twoFactorCodeSchema = z.object({ code: z.string().trim().min(6).max(20) });
 export const twoFactorDisableSchema = z.object({
